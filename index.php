@@ -32,6 +32,7 @@ $_SESSION['requests'][] = time();
 $method = $_SERVER['REQUEST_METHOD'];
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $pathParts = explode('/', trim($path, '/'));
+// 后面基本就是 把 0 当作 uid，1 当作当前操作了。
 
 switch ($method) {
     case 'POST':

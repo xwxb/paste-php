@@ -1,4 +1,10 @@
 RewriteEngine On
+
+<!-- 
+apache 使用
+果请求的文件或目录不存在，
+则将所有请求重写到index.php，并保留原始的查询字符串
+ -->
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ index.php [QSA,L]

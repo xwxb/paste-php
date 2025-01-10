@@ -1,3 +1,26 @@
+<?php
+// Enable error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// Redirect logic
+$request_uri = $_SERVER['REQUEST_URI'];
+$parsed_url = parse_url($request_uri, PHP_URL_PATH);
+if (preg_match('#^/web/.+#', $parsed_url)) {
+    // 这里可以进行你需要的操作，例如重定向
+    header("Location: /web", true, 301);
+    exit();
+}
+
+// Fix path concatenation
+$apiDoc = dirname(__DIR__) . '/docs/api.txt';
+
+// Debug log
+error_log("Looking for file at: " . $apiDoc);
+
+?>
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -25,16 +48,6 @@
         
         <div class="docs-section">
             <?php 
-            // Enable error reporting
-            error_reporting(E_ALL);
-            ini_set('display_errors', 1);
-            
-            // Fix path concatenation
-            $apiDoc = dirname(__DIR__) . '/docs/api.txt';
-            
-            // Debug log
-            error_log("Looking for file at: " . $apiDoc);
-            
             if (file_exists($apiDoc)) {
                 echo '<pre>' . htmlspecialchars(file_get_contents($apiDoc)) . '</pre>';
             } else {
