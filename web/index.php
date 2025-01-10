@@ -3,6 +3,7 @@
 <head>
     <title>Paste</title>
     <link rel="stylesheet" href="/web/style.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
     <main>

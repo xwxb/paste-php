@@ -1,0 +1,82 @@
+ABOUT
+
+    A simple pastebin-like service for sharing text and code snippets.
+
+    Base URL
+
+API USAGE
+
+    Endpoints:
+    ---------
+
+    1. Create Paste
+       POST /api/create
+    
+       Form Parameters:
+       - content: (required) The text content to paste
+       - file_extension: (optional) File extension for syntax highlighting
+       - expires_at: (optional) Expiration timestamp
+       - max_views: (optional) Maximum number of views before deletion
+       - is_encrypted: (optional) Whether to encrypt the content (0 or 1)
+       - is_markdown: (optional) Whether to render as markdown (0 or 1)
+    
+       Response: Redirects to /{uuid}
+    
+    2. View Paste
+       GET /{uuid}
+       - Returns HTML page with formatted content
+    
+       GET /{uuid}.txt
+       - Returns raw text content
+    
+       GET /{uuid}.md
+       - Returns raw markdown content
+    
+       GET /{uuid}/edit
+       - Returns HTML page for editing the paste
+    
+    3. Update Paste
+       POST /{uuid}/update
+    
+       Form Parameters:
+       - content: (required) Updated content
+       - file_extension: (optional) New file extension
+    
+       Response: Redirects to /{uuid}
+    
+    4. Delete Paste
+       DELETE /{uuid}
+    
+       Response:
+       {
+         "message": "Deleted successfully"
+       }
+    
+    Rate Limiting:
+    ------------
+    The API implements basic rate limiting to prevent abuse.
+    Requests are limited per session within a configured time window.
+    
+    Error Responses:
+    --------------
+    - 400: Bad Request (missing parameters)
+    - 404: Paste not found
+    - 429: Rate limit exceeded
+    - 405: Method not allowed
+
+EXAMPLES
+
+    # Create a new paste
+    curl -X POST http://your-domain.com/api/create \
+      -d "content=Hello World" \
+      -d "file_extension=txt"
+    
+    # View a paste
+    curl http://your-domain.com/{uuid}
+    
+    # Update a paste
+    curl -X POST http://your-domain.com/{uuid}/update \
+      -d "content=Updated content"
+    
+    # Delete a paste
+    curl -X DELETE http://your-domain.com/{uuid}
