@@ -1,8 +1,10 @@
 <?php
-class PasteHandler {
+class PasteHandler
+{
     private $db;
 
-    public function __construct() {
+    public function __construct()
+    {
         $storage_dir = dirname(DB_PATH);
         if (!file_exists($storage_dir)) {
             mkdir($storage_dir, 0777, true);
@@ -12,7 +14,8 @@ class PasteHandler {
         $this->initDatabase();
     }
 
-    private function initDatabase() {
+    private function initDatabase()
+    {
         $this->db->exec('
             CREATE TABLE IF NOT EXISTS notes (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -29,9 +32,10 @@ class PasteHandler {
         ');
     }
 
-    public function create($content, $options = []) {
+    public function create($content, $options = [])
+    {
         $uuid = $this->generateUuid();
-        
+
         if (strlen($content) > MAX_PASTE_SIZE) {
             $content = substr($content, 0, MAX_PASTE_SIZE);
             $status = 206; // Partial
@@ -51,7 +55,7 @@ class PasteHandler {
 
         $now = time();
         $expires_at = isset($options['expires_at']) ? $options['expires_at'] : $now + DEFAULT_EXPIRY;
-        
+
         $stmt->bindValue(':uuid', $uuid);
         $stmt->bindValue(':content', $content);
         $stmt->bindValue(':created_at', $now);
@@ -60,40 +64,42 @@ class PasteHandler {
         $stmt->bindValue(':is_encrypted', $options['is_encrypted'] ?? 0);
         $stmt->bindValue(':is_markdown', $options['is_markdown'] ?? 0);
         $stmt->bindValue(':file_extension', $options['file_extension'] ?? '');
-        
+
         $stmt->execute();
 
         return ['uuid' => $uuid, 'status' => $status];
     }
 
-    public function read($uuid) {
+    public function read($uuid)
+    {
         // Remove file extension if present
         $uuid = pathinfo($uuid, PATHINFO_FILENAME);
-        
+
         $stmt = $this->db->prepare('
             SELECT * FROM notes 
             WHERE uuid = :uuid 
             AND (expires_at > :now)
             AND (max_views = 0 OR current_views < max_views)
         ');
-        
+
         $stmt->bindValue(':uuid', $uuid);
         $stmt->bindValue(':now', time());
-        
+
         $result = $stmt->execute();
         $row = $result->fetchArray(SQLITE3_ASSOC);
-        
+
         if ($row) {
             if ($row['max_views'] > 0) {
                 $this->incrementViews($uuid);
             }
             return $row;
         }
-        
+
         return null;
     }
 
-    private function incrementViews($uuid) {
+    private function incrementViews($uuid)
+    {
         $stmt = $this->db->prepare('
             UPDATE notes 
             SET current_views = current_views + 1 
@@ -103,10 +109,16 @@ class PasteHandler {
         $stmt->execute();
     }
 
-    public function update($uuid, $content, $options = []) {
-        if (strlen($content) > MAX_PASTE_SIZE) {
+    public function update($uuid, $content, $options = [])
+    {
+        if (is_string($content) && strlen($content) > MAX_PASTE_SIZE) {
             $content = substr($content, 0, MAX_PASTE_SIZE);
         }
+
+        // 打印函数入参
+        // error_log("Update called with UUID: " . $uuid);
+        // error_log("Content length: " . strlen($content));
+        // error_log("File extension: " . ($options['file_extension'] ?? 'none'));
 
         $stmt = $this->db->prepare('
             UPDATE notes 
@@ -114,23 +126,25 @@ class PasteHandler {
                 file_extension = :file_extension 
             WHERE uuid = :uuid
         ');
-        
+
         $stmt->bindValue(':content', $content);
         $stmt->bindValue(':file_extension', $options['file_extension'] ?? '');
         $stmt->bindValue(':uuid', $uuid);
         $stmt->execute();
-        
+
         return $this->db->changes() > 0;
     }
 
-    public function delete($id) {
+    public function delete($id)
+    {
         $stmt = $this->db->prepare('DELETE FROM pastes WHERE id = :id');
         $stmt->bindValue(':id', $id);
         $stmt->execute();
         return $this->db->changes() > 0;
     }
 
-    private function generateUuid() {
+    private function generateUuid()
+    {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $uuid = '';
         for ($i = 0; $i < 6; $i++) {

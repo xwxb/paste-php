@@ -30,17 +30,18 @@ if (count($_SESSION['requests']) >= RATE_LIMIT_MAX) {
 $_SESSION['requests'][] = time();
 
 // Route handling
+// ~~所有请求都会进入这里~~,php 起的只有第一层路径才会默认走这里，根据请求方法和路径进行不同的处理
 $method = $_SERVER['REQUEST_METHOD'];
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $pathParts = explode('/', trim($path, '/'));
-// part01 把 0 当作 uid，1 当作当前操作了。
+// part01 把 0 当作 uid，1 当作当前操作了；rest设计2部分仅做前端展示
 
 switch ($method) {
     case 'POST':
         // 根 url post 用来创建新的 paste
         if (empty($pathParts[0])) {
             // $content = file_get_contents('php://input'); // 从原始的 POST 数据流中读取内容
-$content = $_POST['content']; // 从解析后的 POST 数据中读取 'content' 字段
+            $content = $_POST['content']; // 从解析后的 POST 数据中读取 'content' 字段
             if (empty($content)) {
                 http_response_code(400);
                 die(json_encode(value: ['error' => 'No content provided']));
@@ -106,8 +107,28 @@ $content = $_POST['content']; // 从解析后的 POST 数据中读取 'content' 
         break;
 
     case 'PUT':
+        // echo 1; die;  // 这里确实要留意，不是地址栏返回的，这里不会展示。
         if (isset($pathParts[0])) {
-            $content = file_get_contents('php://input');
+            $content = $_PUT['content']; // 从解析后的 PUT 数据中读取 'content' 字段
+            
+            // 目前只能手动读，put可能还是不常用
+            // 获取原始输入
+            $putData = file_get_contents('php://input');
+
+            // 解析 multipart/form-data
+            $boundary = substr($_SERVER['CONTENT_TYPE'], strpos($_SERVER['CONTENT_TYPE'], 'boundary=') + 9);
+            $parts = array_slice(explode('--' . $boundary, $putData), 1, -1);
+
+            $data = [];
+            foreach ($parts as $part) {
+                if (preg_match('/name="([^"]+)".*?(?:\r\n|\r|\n){2}(.*)/s', $part, $matches)) {
+                    $data[$matches[1]] = trim($matches[2]);
+                }
+            }
+
+            $content = $data['content'];
+            error_log("content: " . ($content ?? 'empty'));
+
             if ($handler->update($pathParts[0], $content)) {
                 echo json_encode(['message' => 'Updated successfully']);
             } else {
