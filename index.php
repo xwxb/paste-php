@@ -144,6 +144,7 @@ switch ($method) {
     case 'DELETE':
         if (isset($pathParts[0])) {
             if ($handler->delete($pathParts[0])) {
+                http_response_code(204);
                 echo json_encode(['message' => 'Deleted successfully']);
             } else {
                 http_response_code(404);

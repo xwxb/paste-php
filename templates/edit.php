@@ -17,6 +17,7 @@
                     <option value="md">Markdown</option>
                 </select>
                 <button type="submit">Update Paste</button>
+                <button type="button" id="deleteButton" style="background-color: red; color: white;">Delete Paste</button>
             </div>
         </form>
     </main>
@@ -31,6 +32,18 @@
                     window.location.href = '/<?php echo htmlspecialchars($uuid); ?>';
                 }
             });
+        });
+
+        document.getElementById('deleteButton').addEventListener('click', function() {
+            if (confirm('Are you sure you want to delete this paste?')) {
+                fetch('/<?php echo htmlspecialchars($uuid); ?>', {
+                    method: 'DELETE'
+                }).then(response => {
+                    if (response.ok) {
+                        window.location.href = '/<?php echo htmlspecialchars($uuid); ?>';
+                    }
+                });
+            }
         });
     </script>
 </body>

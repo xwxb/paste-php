@@ -135,10 +135,10 @@ class PasteHandler
         return $this->db->changes() > 0;
     }
 
-    public function delete($id)
+    public function delete($uuid)
     {
-        $stmt = $this->db->prepare('DELETE FROM pastes WHERE id = :id');
-        $stmt->bindValue(':id', $id);
+        $stmt = $this->db->prepare('DELETE FROM notes WHERE uuid = :uuid');
+        $stmt->bindValue(':uuid', $uuid);
         $stmt->execute();
         return $this->db->changes() > 0;
     }
