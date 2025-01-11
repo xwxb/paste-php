@@ -1,4 +1,5 @@
 <?php
+
 // Enable error reporting
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -16,22 +17,24 @@ if (preg_match('#^/web/.+#', $parsed_url)) {
 $apiDoc = dirname(__DIR__) . '/docs/api.txt';
 
 // Debug log
-error_log("Looking for file at: " . $apiDoc);
+error_log(message: "Looking for file at: " . $apiDoc);
 
 ?>
 
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Paste</title>
     <link rel="stylesheet" href="/web/style.css">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
+
 <body>
     <main>
         <div class="editor-section">
-            <form action="/api/create" method="post" enctype="multipart/form-data">
+            <form action="/" method="post" enctype="multipart/form-data">
                 <textarea name="content" rows="20" placeholder="Paste your content here..."></textarea>
                 <div class="controls">
                     <select name="file_extension">
@@ -45,9 +48,9 @@ error_log("Looking for file at: " . $apiDoc);
                 </div>
             </form>
         </div>
-        
+
         <div class="docs-section">
-            <?php 
+            <?php
             if (file_exists($apiDoc)) {
                 echo '<pre>' . htmlspecialchars(file_get_contents($apiDoc)) . '</pre>';
             } else {
@@ -57,4 +60,5 @@ error_log("Looking for file at: " . $apiDoc);
         </div>
     </main>
 </body>
+
 </html>

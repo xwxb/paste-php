@@ -10,7 +10,7 @@ API USAGE
     ---------
 
     1. Create Paste
-       POST /api/create
+       POST /
     
        Form Parameters:
        - content: (required) The text content to paste
@@ -36,7 +36,7 @@ API USAGE
        - Returns HTML page for editing the paste
     
     3. Update Paste
-       POST /{uuid}/update
+       PUT /{uuid}
     
        Form Parameters:
        - content: (required) Updated content
@@ -67,7 +67,7 @@ API USAGE
 EXAMPLES
 
     # Create a new paste
-    curl -X POST http://your-domain.com/api/create \
+    curl -X POST http://your-domain.com/ \
       -d "content=Hello World" \
       -d "file_extension=txt"
     
@@ -75,7 +75,7 @@ EXAMPLES
     curl http://your-domain.com/{uuid}
     
     # Update a paste
-    curl -X POST http://your-domain.com/{uuid}/update \
+    curl -X PUT http://your-domain.com/{uuid} \
       -d "content=Updated content"
     
     # Delete a paste

@@ -98,3 +98,21 @@ button:hover {
         border: none;
     }
 }
+
+/* Add paste viewing styles */
+pre {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    overflow-x: auto;
+}
+
+.line-numbers {
+    color: #999;
+    padding-right: 15px;
+    border-right: 1px solid #ddd;
+    margin-right: 15px;
+    -webkit-user-select: none;
+    user-select: none;
+}
